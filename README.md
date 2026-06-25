@@ -1,117 +1,56 @@
-# JSON to DataSet Converter
+# JSON to Dataset — Annotation Visualizer
 
-## Overview
-This script converts JSON annotation files (from labelme) into a structured dataset containing images, semantic segmentation masks, and visualization files. It processes single or batch JSON files and generates organized output directories with corresponding images and labels.
+A Python script that batch-processes [LabelMe](https://github.com/wkentaro/labelme) JSON annotation files and renders the annotated shapes (linestrips, polygons, and vertices) on top of the original images. The resulting visualizations are saved as high-resolution PNG files.
 
 ## Features
-- Converts labelme JSON annotations to image datasets
-- Supports both embedded image data (base64) and external image files
-- Generates semantic segmentation masks
-- Creates label visualization images
-- Produces label name mappings
-- Handles multiple JSON files in batch processing
-- Compatible with both old and new versions of labelme
+
+- **Batch processing** — Automatically finds all `.json` files in the current directory and processes them one by one.
+- **Annotation rendering** — Draws linestrips, polygons (closed-loop), and keypoints with configurable colors and sizes.
+- **High-resolution output** — Exports 300 DPI PNG images with no borders or axes.
+- **Auto-organized output** — All generated images are saved into an `output/` folder, keeping your working directory clean.
 
 ## Requirements
-- Python 3.6+
-- See `requirements.txt` for dependencies
+
+- Python 3.7+
+- See [`requirements.txt`](./requirements.txt) for the full list of dependencies.
 
 ## Installation
 
-### 1. Clone or Download the Repository
 ```bash
-git clone <repository_url>
-cd Json_to_DataSet
-```
-
-### 2. Create a Virtual Environment (Recommended)
-```bash
-python -m venv .venv
-```
-
-### 3. Activate Virtual Environment
-- **Windows (PowerShell):**
-  ```bash
-  .venv\Scripts\Activate.ps1
-  ```
-- **Windows (Command Prompt):**
-  ```bash
-  .venv\Scripts\activate.bat
-  ```
-- **Linux/macOS:**
-  ```bash
-  source .venv/bin/activate
-  ```
-
-### 4. Install Dependencies
-```bash
+# Clone or download the script, then install dependencies
 pip install -r requirements.txt
 ```
 
 ## Usage
 
-### Basic Usage
-Place your JSON files in a folder, then run:
+1. Place the script (`draw_vis.py`) in the same directory as your LabelMe JSON annotation files.
+2. Make sure the original images referenced in the JSON files exist (or adjust the paths in the JSON).
+3. Run the script:
+
 ```bash
-python json_to_dataset.py <folder_path>
+python draw_vis.py
 ```
 
-### With Custom Output Directory
-```bash
-python json_to_dataset.py <folder_path> -o <output_directory>
-```
+4. The rendered images will appear in the `output/` folder, each named after its corresponding JSON file (e.g., `image_001.json` → `output/image_001.png`).
 
-### Example
-```bash
-python json_to_dataset.py ./annotations -o ./output_dataset
-```
+## Configuration
 
-## Input Format
-- **Input:** A folder containing `.json` files exported from labelme
-- **JSON Structure:** Each JSON file should contain:
-  - `imageData`: Base64 encoded image (optional if `imagePath` is provided)
-  - `imagePath`: Path to external image file (used if `imageData` is not present)
-  - `shapes`: Array of annotation objects with labels and point coordinates
+You can tweak the visual appearance by modifying the constants at the top of `draw_vis.py`:
 
-## Output Structure
-For each JSON file, the script creates a directory with:
-```
-output_dir/
-├── json_filename_/
-│   ├── img.png                 # Original image
-│   ├── label.png               # Semantic segmentation mask
-│   ├── label_viz.png           # Visualization overlay (if available)
-│   ├── label_names.txt         # Label mappings (one per line)
-│   └── info.yaml               # Legacy format label configuration
-```
+| Constant         | Default      | Description                         |
+|------------------|--------------|-------------------------------------|
+| `LINE_COLOR`     | `(0.5, 0, 0)` | RGB color of lines and nodes        |
+| `OUTLINE_COLOR`  | `'black'`    | Outline color (reserved for future) |
+| `LINE_WIDTH`     | `1`          | Stroke width of lines               |
+| `NODE_RADIUS`    | `12`         | Size of vertex markers (`s` param)  |
 
-## Output Files Description
-- **img.png:** The original image extracted from the JSON annotation file
-- **label.png:** Semantic segmentation mask where each pixel value corresponds to a label class
-- **label_viz.png:** Colored visualization of the segmentation overlaid on the original image
-- **label_names.txt:** Text file listing all unique label names (one per line)
-- **info.yaml:** YAML configuration file containing label information
+## Output Format
 
-## Important Notes
-⚠️ **Warning:** This script is designed to demonstrate single JSON file conversion and may require modifications for production use with large-scale datasets.
+- **Format**: PNG
+- **DPI**: 300
+- **Size**: Matches the original image dimensions
+- **Background**: The original image (displayed in grayscale) with colored annotations overlaid
 
-## Troubleshooting
+## License
 
-### Issue: "ModuleNotFoundError" for labelme or other packages
-- **Solution:** Ensure virtual environment is activated and all dependencies are installed via `pip install -r requirements.txt`
-
-### Issue: Visualization image (label_viz.png) is not generated
-- **Solution:** This can occur if the `imgviz` library has issues. The script includes fallback handling, and the segmentation mask will still be generated.
-
-### Issue: AttributeError with labelme functions
-- **Solution:** The script includes compatibility code for different versions of labelme. If issues persist, try updating: `pip install --upgrade labelme`
-
-## Dependencies
-- **Pillow:** Image processing
-- **PyYAML:** YAML file handling
-- **numpy:** Numerical operations
-- **labelme:** Annotation utilities and format handling
-- **imgviz:** Image visualization
-
-## Author
-Yijin Chen
+This project is provided for educational and research purposes.
